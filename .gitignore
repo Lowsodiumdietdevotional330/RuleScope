@@ -1,22 +1,52 @@
+# Dependencies
 node_modules/
 client/node_modules/
 
+# Build outputs
 dist/
-temp-build/
 client/build/
 
+# Runtime data
 uploads/
 db.json
 highlights.json
 
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+# OS files
 .DS_Store
 Thumbs.db
 
+# Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 
-assets/*派能*
-assets/*Pylon*
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Electron build outputs
+*.asar
+win-unpacked/
+
+# Package files
+*.tgz
+*.tar.gz

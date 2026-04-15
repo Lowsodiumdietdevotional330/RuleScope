@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Button, Form, Input, message, Modal, Progress, Space, Typography, Upload } from 'antd';
+import { Alert, Button, Form, Input, message, Modal, Progress, Space, Tooltip, Typography, Upload } from 'antd';
 import { DeleteOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../i18n';
@@ -118,19 +118,19 @@ const FileUpload = () => {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: '20px 20px 56px', width: '100%' }}>
+    <div style={{ maxWidth: 800, margin: '0 auto', padding: '20px 20px 56px', width: '100%', minHeight: 'fit-content' }}>
       <div style={{ marginBottom: 32 }}>
         <Title level={2} style={{ fontWeight: 700, letterSpacing: '-0.02em' }}>{t('uploadTitle')}</Title>
-        <Text type="secondary" style={{ fontSize: 15 }}>{t('uploadSubtitle')}</Text>
+        <Text type="secondary" style={{ fontSize: 15, color: 'var(--text-secondary)' }}>{t('uploadSubtitle')}</Text>
       </div>
 
       <div
         style={{
-          background: 'rgba(255, 255, 255, 0.85)',
+          background: 'var(--surface-1)',
           WebkitBackdropFilter: 'blur(20px)',
           backdropFilter: 'blur(20px)',
           borderRadius: 24,
-          border: '1px solid rgba(0, 0, 0, 0.06)',
+          border: '1px solid var(--border-soft)',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
           padding: 28,
           marginBottom: 24,
@@ -164,11 +164,11 @@ const FileUpload = () => {
       {uploadedFiles.length > 0 && (
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.85)',
+            background: 'var(--surface-1)',
             WebkitBackdropFilter: 'blur(20px)',
             backdropFilter: 'blur(20px)',
             borderRadius: 24,
-            border: '1px solid rgba(0, 0, 0, 0.06)',
+            border: '1px solid var(--border-soft)',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
             padding: 28,
             marginBottom: 24,
@@ -187,14 +187,16 @@ const FileUpload = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '14px 18px',
-                  background: 'rgba(255, 255, 255, 0.3)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  background: 'var(--surface-2)',
+                  border: '1px solid var(--border-soft)',
                   borderRadius: 16,
                 }}
               >
                 <div>
-                  <Text strong>{file.name}</Text>
-                  <div style={{ fontSize: 12, color: '#86868b' }}>
+                  <Tooltip title={file.name}>
+                    <Text strong style={{ display: 'inline-block', maxWidth: 520 }} ellipsis>{file.name}</Text>
+                  </Tooltip>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                     {getFileType(file.name)} · {formatFileSize(file.size)}
                   </div>
                 </div>
@@ -257,7 +259,9 @@ const FileUpload = () => {
                 borderRadius: 8,
               }}
             >
-              <Text strong style={{ display: 'block', marginBottom: 12 }}>{file.name}</Text>
+              <Tooltip title={file.name}>
+                <Text strong style={{ display: 'block', marginBottom: 12, maxWidth: '100%' }} ellipsis>{file.name}</Text>
+              </Tooltip>
               <Space style={{ display: 'flex', width: '100%' }} align="start">
                 <Form.Item
                   name={`name_${index}`}

@@ -3,6 +3,10 @@ const path = require('path');
 const { fork } = require('child_process');
 const fs = require('fs');
 
+const MIN_ZOOM_FACTOR = 0.5;
+const MAX_ZOOM_FACTOR = 3;
+const ZOOM_STEP = 0.1;
+
 // Global error handler
 process.on('uncaughtException', (error) => {
     dialog.showErrorBox('Initialization Error', error.stack || error.message);
@@ -19,6 +23,59 @@ let mainWindow;
 let serverProcess;
 let serverReady = false;
 
+function clampZoomFactor(value) {
+  return Math.min(MAX_ZOOM_FACTOR, Math.max(MIN_ZOOM_FACTOR, value));
+}
+
+function isCommandOrControlPressed(input) {
+  return process.platform === 'darwin' ? input.meta : input.control;
+}
+
+function isZoomInShortcut(input) {
+  return (
+    input.key === '+' ||
+    input.code === 'NumpadAdd' ||
+    input.code === 'Equal' ||
+    input.key === '='
+  );
+}
+
+function isZoomOutShortcut(input) {
+  return (
+    input.key === '-' ||
+    input.code === 'Minus' ||
+    input.code === 'NumpadSubtract'
+  );
+}
+
+function isZoomResetShortcut(input) {
+  return (
+    input.key === '0' ||
+    input.code === 'Digit0' ||
+    input.code === 'Numpad0'
+  );
+}
+
+function updateZoom(mainWindowRef, delta) {
+  if (!mainWindowRef || mainWindowRef.isDestroyed()) {
+    return;
+  }
+
+  const currentZoom = mainWindowRef.webContents.getZoomFactor();
+  const nextZoom = clampZoomFactor(
+    Math.round((currentZoom + delta) * 100) / 100
+  );
+  mainWindowRef.webContents.setZoomFactor(nextZoom);
+}
+
+function resetZoom(mainWindowRef) {
+  if (!mainWindowRef || mainWindowRef.isDestroyed()) {
+    return;
+  }
+
+  mainWindowRef.webContents.setZoomFactor(1);
+}
+
 function createWindow() {
   if (mainWindow) return;
   
@@ -26,7 +83,7 @@ function createWindow() {
     mainWindow = new BrowserWindow({
       width: 1300,
       height: 900,
-      title: "文件分析与检索系统 - 启动中...",
+      title: "RuleScope - 启动中...",
       show: false,
       webPreferences: {
         nodeIntegration: false,
@@ -35,6 +92,28 @@ function createWindow() {
     });
 
     mainWindow.setMenuBarVisibility(false);
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      if (!isCommandOrControlPressed(input) || input.alt) {
+        return;
+      }
+
+      if (isZoomInShortcut(input)) {
+        event.preventDefault();
+        updateZoom(mainWindow, ZOOM_STEP);
+        return;
+      }
+
+      if (isZoomOutShortcut(input)) {
+        event.preventDefault();
+        updateZoom(mainWindow, -ZOOM_STEP);
+        return;
+      }
+
+      if (isZoomResetShortcut(input)) {
+        event.preventDefault();
+        resetZoom(mainWindow);
+      }
+    });
     
     const loadApp = () => {
       if (serverReady) {
@@ -51,7 +130,7 @@ function createWindow() {
     
     mainWindow.once('ready-to-show', () => {
       mainWindow.show();
-      mainWindow.setTitle("文件分析与检索系统");
+      mainWindow.setTitle("RuleScope");
     });
 
     mainWindow.on('closed', function () {

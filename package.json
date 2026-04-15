@@ -1,7 +1,7 @@
 {
   "name": "rulescope",
-  "version": "0.0.1",
-  "description": "Desktop app for browsing, searching, and outlining regulation documents.",
+  "version": "0.1.0",
+  "description": "Desktop app for browsing, searching, and outlining regulation documents with Word auto-numbering recognition.",
   "main": "main.js",
   "scripts": {
     "start": "node server-filemanager.js",
@@ -20,9 +20,11 @@
     "desktop-app",
     "electron",
     "word-outline",
-    "search"
+    "search",
+    "auto-numbering",
+    "policy-management"
   ],
-  "author": "Company Regulations Team",
+  "author": "Pumatlarge",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -65,10 +67,12 @@
     },
     "files": [
       "main.js",
+      "loading.html",
       "server-filemanager.js",
       "db.json",
       "highlights.json",
       "uploads/**/*",
+      "utils/**/*",
       "client/build/**/*"
     ],
     "win": {

@@ -15,6 +15,31 @@ import { useLanguage } from '../i18n';
 const { Title, Text } = Typography;
 const { Sider, Content } = Layout;
 
+const HIGHLIGHT_COLOR_STYLES = {
+  yellow: {
+    border: '#f5cf45',
+    background: 'rgba(255, 230, 110, 0.28)',
+  },
+  green: {
+    border: '#5ecb7a',
+    background: 'rgba(120, 224, 143, 0.24)',
+  },
+  blue: {
+    border: '#5b9cff',
+    background: 'rgba(126, 180, 255, 0.24)',
+  },
+  pink: {
+    border: '#ff82b2',
+    background: 'rgba(255, 148, 196, 0.24)',
+  },
+  orange: {
+    border: '#ffad5a',
+    background: 'rgba(255, 184, 108, 0.24)',
+  },
+};
+
+const getHighlightColorStyle = (color) => HIGHLIGHT_COLOR_STYLES[color] || HIGHLIGHT_COLOR_STYLES.yellow;
+
 const Highlights = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -131,12 +156,12 @@ const Highlights = () => {
         <Sider
           width={320}
           style={{
-            background: 'rgba(255, 255, 255, 0.22)',
+            background: 'var(--surface-2)',
             backdropFilter: 'blur(24px) saturate(180%)',
             WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             borderRadius: 24,
-            border: '1px solid rgba(255, 255, 255, 0.35)',
-            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.12)',
+            border: '1px solid var(--border-soft)',
+            boxShadow: 'var(--panel-shadow-soft)',
             overflowY: 'auto',
             padding: '12px',
           }}
@@ -155,15 +180,15 @@ const Highlights = () => {
                     borderRadius: 16,
                     padding: '16px',
                     marginBottom: 12,
-                    background: isActive ? '#00B3BA' : 'rgba(255,255,255,0.95)',
-                    color: isActive ? '#fff' : '#231815',
-                    boxShadow: isActive ? '0 8px 24px rgba(0, 179, 186, 0.2)' : '0 2px 8px rgba(0,0,0,0.04)',
+                    background: isActive ? 'linear-gradient(135deg, var(--accent), var(--accent-strong))' : 'var(--surface-3)',
+                    color: isActive ? '#1b130f' : 'var(--text-primary)',
+                    boxShadow: isActive ? '0 10px 24px rgba(255, 138, 61, 0.22)' : 'var(--panel-shadow-soft)',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    border: isActive ? '1px solid #00B3BA' : '1px solid rgba(0,0,0,0.08)',
+                    border: isActive ? '1px solid transparent' : '1px solid var(--border-soft)',
                   }}
                 >
                   <Tooltip title={doc.regulationName} placement="right">
-                    <Text strong style={{ color: isActive ? '#fff' : 'inherit', fontSize: 14 }} ellipsis>
+                    <Text strong style={{ color: isActive ? '#1b130f' : 'inherit', fontSize: 14 }} ellipsis>
                       {doc.regulationName}
                     </Text>
                   </Tooltip>
@@ -172,16 +197,16 @@ const Highlights = () => {
                       style={{
                         fontSize: 11,
                         padding: '2px 8px',
-                        background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.05)',
+                        background: isActive ? 'rgba(27, 19, 15, 0.12)' : 'var(--surface-muted)',
                         borderRadius: 6,
-                        color: isActive ? '#fff' : '#888',
+                        color: isActive ? '#1b130f' : 'var(--text-secondary)',
                       }}
                     >
                       {doc.version}
                     </span>
                     <Badge
                       count={doc.items.length}
-                      style={{ backgroundColor: isActive ? '#fff' : '#00B3BA', color: isActive ? '#00B3BA' : '#fff', boxShadow: 'none' }}
+                      style={{ backgroundColor: isActive ? '#1b130f' : 'var(--accent)', color: isActive ? '#fff' : '#1b130f', boxShadow: 'none' }}
                     />
                   </div>
                 </div>
@@ -192,19 +217,19 @@ const Highlights = () => {
 
         <Content
           style={{
-            background: 'rgba(255, 255, 255, 0.35)',
+            background: 'var(--surface-2)',
             backdropFilter: 'blur(40px) saturate(200%)',
             WebkitBackdropFilter: 'blur(40px) saturate(200%)',
             borderRadius: 24,
-            border: '1px solid rgba(255, 255, 255, 0.35)',
+            border: '1px solid var(--border-soft)',
             padding: '28px',
             overflowY: 'auto',
-            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.12)',
+            boxShadow: 'var(--panel-shadow-soft)',
           }}
         >
           {selectedDocInfo ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-              <div style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: 20 }}>
+              <div style={{ borderBottom: '1px solid var(--border-soft)', paddingBottom: 20 }}>
                 <Title level={4} style={{ margin: 0 }}>{selectedDocInfo.regulationName}</Title>
                 <Text type="secondary">
                   {selectedDocInfo.version} · {t('highlightsSelectedCount')} {selectedDocHighlights.length} {t('highlightsItems')}
@@ -212,20 +237,22 @@ const Highlights = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                {selectedDocHighlights.map((item) => (
+                {selectedDocHighlights.map((item) => {
+                  const colorStyle = getHighlightColorStyle(item.color);
+                  return (
                   <Card
                     key={item.id}
                     className="highlight-card"
                     style={{
                       borderRadius: 20,
-                      border: item.isPinned ? '2px solid #00B3BA' : '1px solid rgba(0,0,0,0.08)',
-                      background: item.isPinned ? 'rgba(0, 179, 186, 0.03)' : '#ffffff',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                      border: item.isPinned ? '2px solid var(--accent)' : '1px solid var(--border-soft)',
+                      background: item.isPinned ? 'var(--accent-soft)' : 'var(--surface-3)',
+                      boxShadow: 'var(--panel-shadow-soft)',
                       transition: 'all 0.3s',
                     }}
                     extra={item.isPinned && <Tag color="blue" icon={<PushpinFilled />}>{t('highlightsPinned')}</Tag>}
                     actions={[
-                      <Button type="text" size="small" icon={item.isPinned ? <PushpinFilled style={{ color: '#00B3BA' }} /> : <PushpinOutlined />} onClick={() => togglePin(item)}>
+                      <Button type="text" size="small" icon={item.isPinned ? <PushpinFilled style={{ color: 'var(--accent)' }} /> : <PushpinOutlined />} onClick={() => togglePin(item)}>
                         {item.isPinned ? t('highlightsUnpin') : t('highlightsPin')}
                       </Button>,
                       <Button type="text" size="small" icon={<EditOutlined />} onClick={() => { setEditingNoteId(item.id); setTempNote(item.note || ''); }}>
@@ -244,9 +271,9 @@ const Highlights = () => {
                         style={{
                           fontSize: 15,
                           lineHeight: 1.8,
-                          color: '#231815',
-                          borderLeft: `4px solid ${item.isPinned ? '#00B3BA' : '#ffeb3b'}`,
-                          background: item.isPinned ? 'rgba(0, 179, 186, 0.05)' : 'rgba(255, 235, 59, 0.05)',
+                          color: 'var(--text-primary)',
+                          borderLeft: `4px solid ${item.isPinned ? 'var(--accent)' : colorStyle.border}`,
+                          background: item.isPinned ? 'var(--accent-soft)' : colorStyle.background,
                           padding: '12px 16px',
                           borderRadius: '0 12px 12px 0',
                         }}
@@ -280,10 +307,10 @@ const Highlights = () => {
                               style={{
                                 minHeight: 40,
                                 padding: '10px 14px',
-                                background: 'rgba(0,0,0,0.02)',
+                                background: 'var(--surface-muted)',
                                 borderRadius: 12,
                                 fontSize: 13,
-                                color: '#555',
+                                color: 'var(--text-secondary)',
                               }}
                             >
                               {item.note}
@@ -297,7 +324,8 @@ const Highlights = () => {
                       </Text>
                     </div>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ) : (

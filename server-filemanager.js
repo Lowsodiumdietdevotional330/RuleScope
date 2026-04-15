@@ -2,7 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs').promises;
+const fsNative = require('fs');
+const fs = fsNative.promises;
 require('dotenv').config();
 const { extractDocxTextWithNumbering } = require('./utils/docxTextExtractor');
 
@@ -166,7 +167,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // 静态文件服务 (生产环境/编译版)
-const buildPath = path.join(__dirname, 'client', 'build');
+const externalBuildPath = path.join(rootPath, 'client', 'build');
+const bundledBuildPath = path.join(__dirname, 'client', 'build');
+const buildPath = fsNative.existsSync(path.join(externalBuildPath, 'index.html'))
+  ? externalBuildPath
+  : bundledBuildPath;
 app.use(express.static(buildPath));
 
 // 文件上传配置
@@ -388,6 +393,65 @@ app.get('/api/files/:id/content', async (req, res) => {
 
 const Diff = require('diff');
 
+function buildDiffRows(currentContent, previousContent) {
+  const rows = [];
+  const lineDiff = Diff.diffLines(previousContent, currentContent);
+
+  for (let index = 0; index < lineDiff.length; index += 1) {
+    const part = lineDiff[index];
+
+    if (part.added && index > 0 && lineDiff[index - 1].removed) {
+      continue;
+    }
+
+    if (part.removed && index + 1 < lineDiff.length && lineDiff[index + 1].added) {
+      const inlineDiff = Diff.diffChars(part.value, lineDiff[index + 1].value);
+      rows.push({
+        type: 'changed',
+        left: inlineDiff.map((entry) => ({
+          value: entry.removed ? '' : entry.value,
+          added: Boolean(entry.added),
+          removed: false,
+          unchanged: !entry.added && !entry.removed,
+        })).filter((entry) => entry.value),
+        right: inlineDiff.map((entry) => ({
+          value: entry.added ? '' : entry.value,
+          added: false,
+          removed: Boolean(entry.removed),
+          unchanged: !entry.added && !entry.removed,
+        })).filter((entry) => entry.value),
+      });
+      continue;
+    }
+
+    if (part.added) {
+      rows.push({
+        type: 'added',
+        left: [{ value: part.value, added: true, removed: false, unchanged: false }],
+        right: [],
+      });
+      continue;
+    }
+
+    if (part.removed) {
+      rows.push({
+        type: 'removed',
+        left: [],
+        right: [{ value: part.value, added: false, removed: true, unchanged: false }],
+      });
+      continue;
+    }
+
+    rows.push({
+      type: 'unchanged',
+      left: [{ value: part.value, added: false, removed: false, unchanged: true }],
+      right: [{ value: part.value, added: false, removed: false, unchanged: true }],
+    });
+  }
+
+  return rows;
+}
+
 // 统一获取Markdown内容的辅助函数
 async function getMarkdownContent(filename) {
   const filePath = path.join(UPLOADS_DIR, filename);
@@ -407,11 +471,8 @@ app.get('/api/files/diff/:id1/:id2', async (req, res) => {
   try {
     const content1 = await getMarkdownContent(req.params.id1);
     const content2 = await getMarkdownContent(req.params.id2);
-    // DiffLines creates a clean array of added/removed/unchanged blocks
-    const diffResult = Diff.diffLines(content2, content1);
-    // Note logic: new is id1, old is id2 => diffLines(old, new) => returns edits from old -> new
-    // left is new, right is old. We'll return the diff parts.
-    res.json({ diff: diffResult });
+    const diffRows = buildDiffRows(content1, content2);
+    res.json({ diff: diffRows });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Diff failed' });
@@ -435,7 +496,7 @@ app.get('/api/highlights', async (req, res) => {
 // 保存新高亮
 app.post('/api/highlights', async (req, res) => {
   try {
-    const { text, fileId, regulationName, version, note } = req.body;
+    const { text, fileId, regulationName, version, note, color, anchorStart, anchorEnd } = req.body;
     if (!text) return res.status(400).json({ error: '高亮内容不能为空' });
     
     const highlights = await readHighlights();
@@ -446,8 +507,11 @@ app.post('/api/highlights', async (req, res) => {
       regulationName,
       version,
       note: note || '',
+      color: color || 'yellow',
       isPinned: false,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      ...(Number.isInteger(anchorStart) ? { anchorStart } : {}),
+      ...(Number.isInteger(anchorEnd) ? { anchorEnd } : {}),
     };
     highlights.push(newHighlight);
     await saveHighlights(highlights);
@@ -460,13 +524,14 @@ app.post('/api/highlights', async (req, res) => {
 // 更新高亮 (如添加笔记、置顶)
 app.patch('/api/highlights/:id', async (req, res) => {
     try {
-        const { note, isPinned } = req.body;
+        const { note, isPinned, color } = req.body;
         let highlights = await readHighlights();
         const index = highlights.findIndex(h => h.id === req.params.id);
         if (index === -1) return res.status(404).send('Not found');
         
         if (note !== undefined) highlights[index].note = note;
         if (isPinned !== undefined) highlights[index].isPinned = isPinned;
+        if (color !== undefined) highlights[index].color = color;
         
         await saveHighlights(highlights);
         res.json(highlights[index]);

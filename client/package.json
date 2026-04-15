@@ -1,6 +1,6 @@
 {
-  "name": "company-regulations-frontend",
-  "version": "1.0.0",
+  "name": "rulescope-frontend",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.2.6",

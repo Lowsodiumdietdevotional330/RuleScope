@@ -177,18 +177,18 @@ const FilePreview = () => {
           {['.txt', '.docx', '.doc'].includes(file.type) ? (
             <div className="markdown-preview" style={{
               padding: '24px',
-              background: '#fff',
+              background: 'var(--surface-3)',
               borderRadius: '8px',
-              border: '1px solid #f0f0f0',
+              border: '1px solid var(--border-soft)',
               boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
               minHeight: '400px'
             }}>
               {file.type !== '.txt' && (
-                <div style={{ marginBottom: 20, padding: '8px 16px', background: '#e6f7ff', borderLeft: '4px solid #1890ff' }}>
+                <div style={{ marginBottom: 20, padding: '8px 16px', background: 'rgba(24, 144, 255, 0.12)', borderLeft: '4px solid #1890ff' }}>
                   <Text type="info"><b>智能解析：</b>已自动识别文档结构和大纲。</Text>
                 </div>
               )}
-              <div style={{ lineHeight: '1.8', color: '#262626' }}>
+              <div style={{ lineHeight: '1.8', color: 'var(--text-primary)' }}>
                 <ReactMarkdown>{content}</ReactMarkdown>
               </div>
             </div>

@@ -44,7 +44,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   overflow: hidden;
-  background: #fdfdfd; /* Clean white background */
+  background: transparent;
 }
 
 /* ============================================
@@ -65,6 +65,17 @@ body::after {
   z-index: -1;
   background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%);
   pointer-events: none;
+}
+
+body.theme-dark::before {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 138, 61, 0.08), transparent 24%),
+    radial-gradient(circle at 82% 0%, rgba(168, 85, 247, 0.07), transparent 22%),
+    linear-gradient(180deg, #151515 0%, #101010 100%);
+}
+
+body.theme-dark::after {
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent 22%);
 }
 
 @keyframes meshShift {
@@ -140,7 +151,7 @@ body::after {
 
 /* Override AntD Layout background  */
 .ant-layout {
-  background: transparent !important;
+  background: var(--app-bg) !important;
 }
 
 .ant-layout-header {
@@ -559,6 +570,27 @@ body.dark-mode {
 .highlight-card:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.theme-dark .ant-btn {
+  border-color: var(--border-soft) !important;
+}
+
+body.theme-dark .ant-btn:not(.ant-btn-primary) {
+  background: var(--surface-raised) !important;
+  color: var(--text-primary) !important;
+}
+
+body.theme-dark .ant-btn:not(.ant-btn-primary):hover {
+  background: #303030 !important;
+}
+
+body.theme-dark .ant-btn-text {
+  background: transparent !important;
+}
+
+body.theme-dark .ant-btn-text:hover {
+  background: var(--hover-soft) !important;
 }
 
 /* ============================================
